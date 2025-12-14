@@ -1,0 +1,32 @@
+name: dotnet package
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Set default working directory for all steps
+    defaults:
+      run:
+        working-directory: ./ecommerce-api
+    
+    strategy:
+      matrix:
+        dotnet-version: [8.0]
+    
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Setup .NET Core ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Run unit tests
+        run: dotnet test --no-build --verbosity normal --configuration Release
